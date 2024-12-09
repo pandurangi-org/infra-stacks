@@ -1,0 +1,4 @@
+template:
+  path: accb-acca-vpc-peer.yaml
+  type: file
+parameters:

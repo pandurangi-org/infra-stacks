@@ -1,0 +1,13 @@
+Resources:
+
+  vpcPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      VpcId: vpc-094cbcdae7e2a9e6c
+      PeerVpcId: vpc-0a153346fc3f8d911 
+      PeerOwnerId: 533266955533
+      PeerRegion: us-east-1
+      PeerRoleArn: arn:aws:iam::533266955533:role/grpmainvpcpeerrole
+      Tags:
+      - Key: Name
+        Value: vpc-peering

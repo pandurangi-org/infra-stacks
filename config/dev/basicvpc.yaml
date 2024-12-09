@@ -1,0 +1,6 @@
+template:
+  path: basicvpc.yaml
+  type: file
+parameters:
+  EnvironmentName: production
+  AccountName: grpmain

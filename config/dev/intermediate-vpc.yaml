@@ -1,0 +1,5 @@
+template:
+  path: intermediate-vpc.yaml
+  type: file
+parameters:
+  EnvironmentName: production

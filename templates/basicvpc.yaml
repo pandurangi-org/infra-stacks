@@ -1,0 +1,73 @@
+
+Description:  This template deploys a VPC, with a pair of public and private subnets spread
+    across two Availability Zones. It deploys an internet gateway, with a default
+    route on the public subnets. It deploys a pair of NAT gateways (one in each AZ),
+    and default routes for them in the private subnets.
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+  AccountName:
+    Description: Account name
+    Type: String
+  
+Mappings: 
+  AccountIPMap: 
+    grpmain:
+      VpcCIDR: 10.0.0.0/16
+      Fragment: 1
+    accounta:
+      VpcCIDR: 10.1.0.0/16
+      Fragment: 2
+    accountb:
+      VpcCIDR: 10.2.0.0/16
+      Fragment: 3
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !FindInMap [AccountIPMap, !Ref AccountName, VpcCIDR]
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      CidrBlock: !Select
+        - !FindInMap [AccountIPMap, !Ref AccountName, Fragment]
+        - !Cidr
+          - !GetAtt VPC.CidrBlock
+          - 16
+          - 8
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+        - Key: Account
+          Value: !Ref AccountName
+
+
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+
+
+Outputs:
+  VPC:
+    Description: A reference to the created VPC
+    Value: !Ref VPC
+
+  PrivateSubnet1:
+    Description: A reference to the private subnet in the 1st Availability Zone
+    Value: !Ref PrivateSubnet1
