@@ -14,14 +14,14 @@ Mappings:
     grpmain:
       VpcCIDR: 10.0.0.0/16
       PrivateFragment: 1
-      PublicFragment: 2
+      PublicFragment: 4
     accounta:
       VpcCIDR: 10.1.0.0/16
-      PrivateFragment: 3
-      PublicFragment: 4
+      PrivateFragment: 2
+      PublicFragment: 5
     accountb:
       VpcCIDR: 10.2.0.0/16
-      PrivateFragment: 5
+      PrivateFragment: 3
       PublicFragment: 6
 
 Resources:
@@ -70,7 +70,7 @@ Resources:
       VpcId: !Ref VPC
       AvailabilityZone: !Select [ 0, !GetAZs  '' ]
       CidrBlock: !Select
-        - !FindInMap [AccountIPMap, !Ref AccountName, PublicFragment]
+        - !FindInMap [AccountIPMap, !Ref AccountName, PrivateFragment]
         - !Cidr
           - !GetAtt VPC.CidrBlock
           - 16
@@ -79,18 +79,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
-
-  NatGateway1EIP:
-    Type: AWS::EC2::EIP
-    DependsOn: InternetGatewayAttachment
-    Properties:
-      Domain: vpc
-
-  NatGateway1:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatGateway1EIP.AllocationId
-      SubnetId: !Ref PublicSubnet1
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -113,7 +101,6 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
-
 
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
